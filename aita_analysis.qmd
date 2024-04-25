@@ -14,14 +14,68 @@ Quarto enables you to weave together content and executable code into a finished
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
-1 + 1
+#| label: load-packages
+library(tidyverse)
+library(duckplyr)
+library(duckdb)
+library(repurrrsive)
+library(jsonlite)
+library(sparklyr)
+library(ndjson)
+```
+
+```{r}
+#\ label: spark-setup
+sc <- spark_connect(master = "local")
 ```
 
 You can add options to executable code like this
-
+```{r}
+#| label: trying-spark
+submissions <- spark_read_json(sc, path = "AmItheAsshole_submission")
+```
 ```{r}
 #| echo: false
-2 * 2
+submissions <- jsonlite::stream_in(file('AmItheAsshole_submission'), pagesize = 100000)
+
+https://stackoverflow.com/questions/36923687/how-to-start-stream-in-not-from-the-begining-of-the-file
+
+```
+
+```{r}
+temp <- tempfile(fileext = ".feather")
+head(submissions)
+submissions <- submissions %>% 
+  select(link_flair_text,
+         num_comments,
+         over_18,
+         score,
+         url,
+         selftext,
+         title,
+         id,
+         edited,
+         is_self,
+         permalink,
+         downs,
+         ups,
+         created)
+
+submissions <- submissions %>% 
+  mutate(date = as.Date(.POSIXct(created, tz="UTC")))
+
+just_2023 <- submissions %>% 
+  filter(date > 2023) 
+
+just_2023 %>% 
+  arrow::write_parquet("2023_data.parquet")
+
+utc <- .POSIXct(1393275159, tz="UTC")
+
+```
+
+```{r}
+arrow::read_parquet("2023_data.parquet")
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
