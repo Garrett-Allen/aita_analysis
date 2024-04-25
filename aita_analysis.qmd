@@ -30,10 +30,12 @@ sc <- spark_connect(master = "local")
 ```
 
 You can add options to executable code like this
+
 ```{r}
 #| label: trying-spark
 submissions <- spark_read_json(sc, path = "AmItheAsshole_submission")
 ```
+
 ```{r}
 #| echo: false
 submissions <- jsonlite::stream_in(file('AmItheAsshole_submission'), pagesize = 100000)
@@ -75,7 +77,36 @@ utc <- .POSIXct(1393275159, tz="UTC")
 ```
 
 ```{r}
-arrow::read_parquet("2023_data.parquet")
+reddit_data <- arrow::read_parquet("2023_data_2.parquet")
+
 ```
+
+```{r}
+#| label: crate_labeled_dataset
+reddit_data_labeled <- reddit_data %>% 
+  filter(link_flair_text %in% c("Asshole",
+                                "Asshole POO Mode",
+                                "Everyone Sucks",
+                                "Everyone Sucks POO Mode",
+                                "Mega Asshole",
+                                "No A-holes here",
+                                "Not enough info",
+                                "Not enough info POO mode",
+                                "Not the A-hole",
+                                "Not the A-hole POO Mode"))
+
+arrow::write_parquet(reddit_data_labeled, "labeled_post.parquet")
+```
+
+
+```{r}
+reddit_data_labeled %>% 
+  count(link_flair_text)
+```
+
+
+# Info: 
+
+
 
 The `echo: false` option disables the printing of code (only output is displayed).
