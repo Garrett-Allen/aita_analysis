@@ -40,7 +40,7 @@ submissions <- spark_read_json(sc, path = "AmItheAsshole_submission")
 #| echo: false
 submissions <- jsonlite::stream_in(file('AmItheAsshole_submission'), pagesize = 100000)
 
-https://stackoverflow.com/questions/36923687/how-to-start-stream-in-not-from-the-begining-of-the-file
+# https://stackoverflow.com/questions/36923687/how-to-start-stream-in-not-from-the-begining-of-the-file
 
 ```
 
@@ -100,8 +100,11 @@ arrow::write_parquet(reddit_data_labeled, "labeled_post.parquet")
 
 
 ```{r}
-reddit_data_labeled %>% 
-  count(link_flair_text)
+reddit_data <- arrow::read_parquet("labeled_post.parquet")
+```
+
+```{r}
+
 ```
 
 
