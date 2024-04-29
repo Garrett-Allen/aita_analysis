@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 *.parquet
+*.csv
+.ipynb_checkpoints
