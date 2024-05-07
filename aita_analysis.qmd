@@ -93,23 +93,47 @@ reddit_data_labeled <- reddit_data %>%
                                 "Not enough info",
                                 "Not enough info POO mode",
                                 "Not the A-hole",
-                                "Not the A-hole POO Mode"))
+                                "Not the A-hole POO Mode")) %>% 
+  filter(link_flair_text == "Not the A-hole" | 
+           link_flair_text == "Asshole")
+
+reddit_data_labeled <- reddit_data_labeled %>% 
+  filter(!(selftext == "[deleted]" | selftext == "[removed]"))
 
 arrow::write_parquet(reddit_data_labeled, "labeled_post.parquet")
 ```
-
 
 ```{r}
 reddit_data <- arrow::read_parquet("labeled_post.parquet")
 ```
 
-```{r}
+# Category prediction
 
+any huggingface models trained on data similar to this? that can run and are feasible? look for some papers
+
+clustering algorithms, word embeddings
+
+```{r}
+reddit_data %>% 
+  count(link_flair_text)
 ```
 
+# Category prediction
 
-# Info: 
+any huggingface models trained on data similar to this? that can run and are feasible? look for some papers
 
+clustering algorithms, word embeddings
 
+# Sentiment analysis
 
-The `echo: false` option disables the printing of code (only output is displayed).
+look for sentiment libraries- what did other people use? what did the other reddit data analysis use? what seems reasonable?
+
+# Fitting some initial models
+
+rf, logistic regression, clustering algorithms \# Evaluation pipeline
+
+ROC, AUC, precision/accuracy/f1 score
+
+# general things:
+
+do we want to collect any specific reddit user data?
